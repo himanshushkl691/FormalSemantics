@@ -1,6 +1,160 @@
 // #include "dataStructures.h"
 #include <limits.h>
-//------------------------------Abstract Syntax Tree Declrations-----------------------------
+//-------------------------------------Doubly Linked List---------------------------
+struct dll_node *getNewDLLNode(char *k, int v)
+{
+    struct dll_node *newn = (struct dll_node *)malloc(sizeof(struct dll_node));
+    newn->key = (char *)malloc(strlen(k) * sizeof(char));
+    newn->key = strdup(k);
+    newn->val = v;
+    newn->left = NULL;
+    newn->right = NULL;
+    return newn;
+}
+struct dll *getNewDLL()
+{
+    struct dll *newn = (struct dll *)malloc(sizeof(struct dll));
+    newn->head = NULL;
+    newn->tail = NULL;
+    newn->size = 0;
+    return newn;
+}
+struct dll *push_back(struct dll *list, char *key, int val)
+{
+    struct dll_node *newn = getNewDLLNode(key, val);
+    if (list->size == 0)
+    {
+        list->head = list->tail = newn;
+    }
+    else
+    {
+        list->tail->right = newn;
+        newn->left = list->tail;
+        list->tail = newn;
+    }
+    list->size++;
+    return list;
+}
+struct dll *erase(struct dll *list, struct dll_node *node)
+{
+    if (list->size == 0)
+        return list;
+    struct dll_node *prev = node->left;
+    struct dll_node *next = node->right;
+    if (prev != NULL && next != NULL)
+    {
+        prev->right = next;
+        next->left = prev;
+        node->left = node->right = NULL;
+        free(node);
+    }
+    else if (prev != NULL)
+    {
+        prev->right = NULL;
+        node->left = NULL;
+        list->tail = prev;
+        free(node);
+    }
+    else if (next != NULL)
+    {
+        next->left = NULL;
+        list->head = next;
+        node->right = NULL;
+        free(node);
+    }
+    else
+    {
+        list->head = NULL;
+        list->tail = NULL;
+        free(node);
+    }
+    list->size--;
+    return list;
+}
+void printLL(struct dll *list)
+{
+    struct dll_node *curr = list->head;
+    while (curr != NULL)
+    {
+        printf("[ %s, %d] ", curr->key, curr->val);
+        curr = curr->right;
+    }
+    printf("\n");
+    return;
+}
+//----------------------------------------------------------------------------------
+//--------------------------------------Hash Table----------------------------------
+struct hash_table *getNewHashTable()
+{
+    struct hash_table *newn = (struct hash_table *)malloc(sizeof(struct hash_table));
+    newn->arr = (struct dll **)malloc(9973 * sizeof(struct dll));
+    for (int i = 0; i < 9973; i++)
+        newn->arr[i] = getNewDLL();
+    return newn;
+}
+int hash_function(char *str)
+{
+    int len = strlen(str);
+    int res = 0;
+    for (int i = len - 1; i >= 0; i--)
+    {
+        int temp = (53 * res) % 9973;
+        res = (temp + (str[i] - 'a')) % 9973;
+    }
+    return res;
+}
+struct dll_node *search(struct hash_table *map, char *key)
+{
+    int hash = hash_function(key);
+    struct dll_node *curr = map->arr[hash]->head;
+    while (curr != NULL)
+    {
+        if (strcmp(key, curr->key) == 0)
+            return curr;
+        curr = curr->right;
+    }
+    return NULL;
+}
+struct hash_table *put(struct hash_table *map, char *key, int val)
+{
+    struct dll_node *res = search(map, key);
+    int hash = hash_function(key);
+    if (res == NULL)
+    {
+        map->arr[hash] = push_back(map->arr[hash], key, val);
+    }
+    else
+    {
+        res->val = val;
+    }
+    return map;
+}
+struct hash_table *remove(struct hash_table *map, char *key)
+{
+    struct dll_node *res = search(map, key);
+    if (res == NULL)
+        return map;
+    else
+    {
+        int hash = hash_function(key);
+        map->arr[hash] = erase(map->arr[hash], res);
+    }
+    return map;
+}
+void printMap(struct hash_table *map)
+{
+    for (int i = 0; i < 9973; i++)
+    {
+        if (map->arr[i]->size > 0)
+        {
+            printf("%d---> ", i);
+            printLL(map->arr[i]);
+        }
+    }
+    return;
+}
+//----------------------------------------------------------------------------------
+//------------------------------Abstract Syntax Tree Declarations-----------------------------
 struct AST_Node *makeTreeNode(int typeClass, int nodeType, char *varname, int operator, int val, char *s, struct AST_Node *l, struct AST_Node *r)
 {
     struct AST_Node *newn = (struct AST_Node *)malloc(sizeof(struct AST_Node));

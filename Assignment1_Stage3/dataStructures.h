@@ -17,6 +17,36 @@
 #define MINUS 13
 #define MUL 14
 
+//-------------------------------------Doubly Linked List---------------------------
+struct dll_node
+{
+    char *key;
+    int val;
+    struct dll_node *left, *right;
+};
+struct dll
+{
+    int size;
+    struct dll_node *head, *tail;
+};
+struct dll_node *getNewDLLNode(char *k, int v);
+struct dll *getNewDLL();
+struct dll *push_back(struct dll *list, char *key, int val);
+struct dll *erase(struct dll *list, struct dll_node *node);
+void printLL(struct dll *list);
+//----------------------------------------------------------------------------------
+//--------------------------------------Hash Table----------------------------------
+struct hash_table
+{
+    struct dll **arr;
+};
+struct hash_table *getNewHashTable();
+int hash_function(char *str);
+struct dll_node *search(struct hash_table *map, char *key);
+struct hash_table *put(struct hash_table *map, char *key, int val);
+struct hash_table *remove(struct hash_table *map, char *key);
+void printMap(struct hash_table *map);
+//----------------------------------------------------------------------------------
 //--------------------------------------Abstract Syntax Tree Declarations---------------------------------
 struct AST_Node
 {
