@@ -129,7 +129,7 @@ struct hash_table *put(struct hash_table *map, char *key, int val)
     }
     return map;
 }
-struct hash_table *remove(struct hash_table *map, char *key)
+struct hash_table *removeKey(struct hash_table *map, char *key)
 {
     struct dll_node *res = search(map, key);
     if (res == NULL)

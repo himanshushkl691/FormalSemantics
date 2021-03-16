@@ -44,7 +44,7 @@ struct hash_table *getNewHashTable();
 int hash_function(char *str);
 struct dll_node *search(struct hash_table *map, char *key);
 struct hash_table *put(struct hash_table *map, char *key, int val);
-struct hash_table *remove(struct hash_table *map, char *key);
+struct hash_table *removeKey(struct hash_table *map, char *key);
 void printMap(struct hash_table *map);
 //----------------------------------------------------------------------------------
 //--------------------------------------Abstract Syntax Tree Declarations---------------------------------
