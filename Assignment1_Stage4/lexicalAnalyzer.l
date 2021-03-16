@@ -12,6 +12,11 @@ digit [0-9]
 %%
 true    {yylval.node = makeTreeNode(BOOLEAN,VALUE,NULL,NONE,TRUE,yytext,NULL,NULL);return _TRUE;}
 false   {yylval.node = makeTreeNode(BOOLEAN,VALUE,NULL,NONE,FALSE,yytext,NULL,NULL);return _FALSE;}
+if      {return _IF;}
+then    {return _THEN;}
+else    {return _ELSE;}
+while   {return _WHILE;}
+do      {return _DO;}
 "&&"    {return _AND;}
 "||"    {return _OR;}
 "!"     {return _NOT;}

@@ -60,7 +60,12 @@ extern int yydebug;
     _MUL = 266,
     _EQUALITY = 267,
     _VARIABLE = 268,
-    _ASSIGN = 269
+    _ASSIGN = 269,
+    _IF = 270,
+    _THEN = 271,
+    _ELSE = 272,
+    _WHILE = 273,
+    _DO = 274
   };
 #endif
 /* Tokens.  */
@@ -76,6 +81,11 @@ extern int yydebug;
 #define _EQUALITY 267
 #define _VARIABLE 268
 #define _ASSIGN 269
+#define _IF 270
+#define _THEN 271
+#define _ELSE 272
+#define _WHILE 273
+#define _DO 274
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -85,7 +95,7 @@ union YYSTYPE
 
     struct AST_Node *node;
 
-#line 89 "y.tab.h"
+#line 99 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -18,7 +18,8 @@
 %type <node> Boolean    Arithmetic  Statement   _TRUE _FALSE   _NUMERIC_VALUE  _VARIABLE
 /*TOKENS*/
 //operator
-%token _AND _OR _NOT    _TRUE   _FALSE  _NUMERIC_VALUE  _PLUS   _MINUS  _MUL    _EQUALITY   _VARIABLE   _ASSIGN
+%token  _AND _OR _NOT    _TRUE   _FALSE  _NUMERIC_VALUE  _PLUS   _MINUS  _MUL    _EQUALITY
+%token  _VARIABLE   _ASSIGN _IF _THEN   _ELSE   _WHILE  _DO
 //Associativity
 %left   _OR
 %left   _AND
@@ -92,6 +93,8 @@ Statement   :   Statement ';' Statement {
 |   _VARIABLE   _ASSIGN Arithmetic      {
                                             $$ = makeTreeNode(STATEMENT,ASSIGNMENT,NULL,ASSIGN,NONE,":=",$1,$3);
                                         }
+|   _IF '(' Boolean ')' _THEN   Statement   _ELSE   Statement   {printf("yes\n");exit(1);}
+|   _WHILE  '(' Boolean ')' _DO Statement                       {printf("YES\n");exit(1);}
 ;
 %%
 //-------------------------Auxiliary Functions--------------------------
