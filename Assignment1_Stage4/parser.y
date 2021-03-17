@@ -96,12 +96,12 @@ Statement   :   Statement ';' Statement {
 |   _SKIP                               {
                                             $$ = $1;
                                         }
-|   _IF '(' Boolean ')' _THEN   Statement   _ELSE   Statement   {
-                                                                    struct AST_Node *temp = makeTreeNode(STATEMENT,ELSE,NULL,NONE,NONE,"else",$3,$8);
-                                                                    $$ = makeTreeNode(STATEMENT,CONDITIONAL,NULL,NONE,NONE,"if",$6,temp);
+|   _IF '('Boolean')' _THEN '{'Statement'}' _ELSE '{'Statement'}'{
+                                                                    struct AST_Node *temp = makeTreeNode(STATEMENT,ELSE,NULL,NONE,NONE,"else",$3,$11);
+                                                                    $$ = makeTreeNode(STATEMENT,CONDITIONAL,NULL,NONE,NONE,"if",$7,temp);
                                                                 }
-|   _WHILE  '(' Boolean ')' _DO Statement                       {
-                                                                    $$ = makeTreeNode(STATEMENT,WHILE,NULL,NONE,NONE,"while",$3,$6);
+|   _WHILE  '(' Boolean ')' _DO '{' Statement   '}'             {
+                                                                    $$ = makeTreeNode(STATEMENT,WHILE,NULL,NONE,NONE,"while",$3,$7);
                                                                 }
 ;
 %%
