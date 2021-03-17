@@ -22,6 +22,10 @@
 #define ASSIGN 17
 #define SEQUENCE 18
 #define SEMICOLON 19
+#define SKIP 20
+#define CONDITIONAL 21
+#define ELSE 22
+#define WHILE 23
 
 //-------------------------------------Doubly Linked List---------------------------
 struct dll_node

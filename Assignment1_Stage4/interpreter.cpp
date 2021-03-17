@@ -181,6 +181,20 @@ struct AST_Node *makeTreeNode(int typeClass, int nodeType, char *varname, int op
     newn->right = r;
     return newn;
 }
+struct AST_Node *copyTree(struct AST_Node *root)
+{
+    if (root == NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+        struct AST_Node *res = makeTreeNode(root->typeClass, root->nodeType, root->varname, root->oper, root->val, root->s, NULL, NULL);
+        res->left = copyTree(root->left);
+        res->right = copyTree(root->right);
+        return res;
+    }
+}
 struct AST_Node *ASTDelete(struct AST_Node *root)
 {
     if (root)
@@ -413,10 +427,12 @@ struct AST_Node *reduceBooleanExpression(struct AST_Node *root)
 
 struct AST_Node *reduceArithmeticExpression(struct AST_Node *root)
 {
-    if (root->nodeType == VARIABLE)
+    struct AST_Node *curr;
+    struct dll_node *res;
+    switch (root->nodeType)
     {
-        struct dll_node *res = search(map, root->varname);
-        struct AST_Node *curr;
+    case VARIABLE:
+        res = search(map, root->varname);
         if (res == NULL)
         {
             printf("\nUsing variable before assigning\n");
@@ -432,23 +448,21 @@ struct AST_Node *reduceArithmeticExpression(struct AST_Node *root)
             ASTDelete(root);
             return curr;
         }
-    }
-    else
-    {
+        break;
+    case EXPRESSION:
         switch (root->oper)
         {
         case PLUS:
             if (root->left->nodeType == VALUE)
             {
-                struct AST_Node *curr;
                 if (root->right->nodeType == VALUE)
                 {
                     int a = root->left->val;
                     int b = root->right->val;
-                    int res = a + b;
-                    char *news[(((sizeof res) * CHAR_BIT) + 2) / 3 + 2];
-                    sprintf(news, "%d", res);
-                    curr = makeTreeNode(ARITHMETIC, VALUE, NULL, NONE, res, news, NULL, NULL);
+                    int result = a + b;
+                    char *news[(((sizeof result) * CHAR_BIT) + 2) / 3 + 2];
+                    sprintf(news, "%d", result);
+                    curr = makeTreeNode(ARITHMETIC, VALUE, NULL, NONE, result, news, NULL, NULL);
                     ASTDelete(root);
                     return curr;
                 }
@@ -467,15 +481,14 @@ struct AST_Node *reduceArithmeticExpression(struct AST_Node *root)
         case MINUS:
             if (root->left->nodeType == VALUE)
             {
-                struct AST_Node *curr;
                 if (root->right->nodeType == VALUE)
                 {
                     int a = root->left->val;
                     int b = root->right->val;
-                    int res = a - b;
-                    char *news[(((sizeof res) * CHAR_BIT) + 2) / 3 + 2];
-                    sprintf(news, "%d", res);
-                    curr = makeTreeNode(ARITHMETIC, VALUE, NULL, NONE, res, news, NULL, NULL);
+                    int result = a - b;
+                    char *news[(((sizeof result) * CHAR_BIT) + 2) / 3 + 2];
+                    sprintf(news, "%d", result);
+                    curr = makeTreeNode(ARITHMETIC, VALUE, NULL, NONE, result, news, NULL, NULL);
                     ASTDelete(root);
                     return curr;
                 }
@@ -494,15 +507,14 @@ struct AST_Node *reduceArithmeticExpression(struct AST_Node *root)
         case MUL:
             if (root->left->nodeType == VALUE)
             {
-                struct AST_Node *curr;
                 if (root->right->nodeType == VALUE)
                 {
                     int a = root->left->val;
                     int b = root->right->val;
-                    int res = a * b;
-                    char *news[(((sizeof res) * CHAR_BIT) + 2) / 3 + 2];
-                    sprintf(news, "%d", res);
-                    curr = makeTreeNode(ARITHMETIC, VALUE, NULL, NONE, res, news, NULL, NULL);
+                    int result = a * b;
+                    char *news[(((sizeof result) * CHAR_BIT) + 2) / 3 + 2];
+                    sprintf(news, "%d", result);
+                    curr = makeTreeNode(ARITHMETIC, VALUE, NULL, NONE, result, news, NULL, NULL);
                     ASTDelete(root);
                     return curr;
                 }
@@ -519,20 +531,32 @@ struct AST_Node *reduceArithmeticExpression(struct AST_Node *root)
             }
             break;
         default:
-            printf("nodeType not in Arithmetic expressions\n");
+            printf("operator not in Arithmetic expressions\n");
             break;
         }
-        return root;
+        break;
+    default:
+        printf("nodeType not in Arithmetic expressions\n");
+        break;
     }
+    return root;
 }
 struct AST_Node *reduceStatement(struct AST_Node *root)
 {
-    switch (root->oper)
+    struct AST_Node *curr;
+    struct AST_Node *curr1;
+    struct AST_Node *curr2;
+    struct AST_Node *curr3;
+    switch (root->nodeType)
     {
-    case ASSIGN:
+    case SKIP:
+        curr = makeTreeNode(NONE, NONE, NULL, NONE, NONE, NULL, NULL, NULL);
+        ASTDelete(root);
+        return curr;
+        break;
+    case ASSIGNMENT:
         if (root->right->nodeType == VALUE)
         {
-            struct AST_Node *curr;
             map = put(map, root->left->varname, root->right->val);
             curr = makeTreeNode(NONE, NONE, NULL, NONE, NONE, NULL, NULL, NULL);
             ASTDelete(root);
@@ -544,10 +568,9 @@ struct AST_Node *reduceStatement(struct AST_Node *root)
             return root;
         }
         break;
-    case SEMICOLON:
+    case SEQUENCE:
         if (root->left->typeClass == NONE)
         {
-            struct AST_Node *curr;
             curr = root->right;
             root->right = NULL;
             ASTDelete(root);
@@ -558,7 +581,6 @@ struct AST_Node *reduceStatement(struct AST_Node *root)
             root->left = reduceStatement(root->left);
             if (root->left->typeClass == NONE)
             {
-                struct AST_Node *curr;
                 curr = root->right;
                 root->right = NULL;
                 ASTDelete(root);
@@ -566,6 +588,38 @@ struct AST_Node *reduceStatement(struct AST_Node *root)
             }
             return root;
         }
+        break;
+    case CONDITIONAL:
+        if (root->right->left->nodeType == VALUE)
+        {
+            if (root->right->left->val == TRUE)
+            {
+                curr = root->left;
+                root->left = NULL;
+                ASTDelete(root);
+                return curr;
+            }
+            else
+            {
+                curr = root->right->right;
+                root->right->right = NULL;
+                ASTDelete(root);
+                return curr;
+            }
+        }
+        else
+        {
+            root->right->left = reduceBooleanExpression(root->right->left);
+            return root;
+        }
+        break;
+    case WHILE:
+        curr1 = makeTreeNode(STATEMENT, SEQUENCE, NULL, SEMICOLON, NONE, ";", copyTree(root->right), copyTree(root));
+        curr2 = makeTreeNode(STATEMENT, SKIP, NULL, NONE, NONE, "skip", NULL, NULL);
+        curr3 = makeTreeNode(STATEMENT, ELSE, NULL, NONE, NONE, "else", copyTree(root->left), curr2);
+        curr = makeTreeNode(STATEMENT, CONDITIONAL, NULL, NONE, NONE, "if", curr1, curr3);
+        ASTDelete(root);
+        return curr;
         break;
     default:
         printf("nodeType not in Statements\n");

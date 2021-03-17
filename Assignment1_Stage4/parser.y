@@ -15,11 +15,11 @@
 };
 
 /**/
-%type <node> Boolean    Arithmetic  Statement   _TRUE _FALSE   _NUMERIC_VALUE  _VARIABLE
+%type <node> Boolean    Arithmetic  Statement   _TRUE _FALSE   _NUMERIC_VALUE  _VARIABLE    _SKIP
 /*TOKENS*/
 //operator
 %token  _AND _OR _NOT    _TRUE   _FALSE  _NUMERIC_VALUE  _PLUS   _MINUS  _MUL    _EQUALITY
-%token  _VARIABLE   _ASSIGN _IF _THEN   _ELSE   _WHILE  _DO
+%token  _VARIABLE   _ASSIGN _IF _THEN   _ELSE   _WHILE  _DO _SKIP
 //Associativity
 %left   _OR
 %left   _AND
@@ -93,8 +93,16 @@ Statement   :   Statement ';' Statement {
 |   _VARIABLE   _ASSIGN Arithmetic      {
                                             $$ = makeTreeNode(STATEMENT,ASSIGNMENT,NULL,ASSIGN,NONE,":=",$1,$3);
                                         }
-|   _IF '(' Boolean ')' _THEN   Statement   _ELSE   Statement   {printf("yes\n");exit(1);}
-|   _WHILE  '(' Boolean ')' _DO Statement                       {printf("YES\n");exit(1);}
+|   _SKIP                               {
+                                            $$ = $1;
+                                        }
+|   _IF '(' Boolean ')' _THEN   Statement   _ELSE   Statement   {
+                                                                    struct AST_Node *temp = makeTreeNode(STATEMENT,ELSE,NULL,NONE,NONE,"else",$3,$8);
+                                                                    $$ = makeTreeNode(STATEMENT,CONDITIONAL,NULL,NONE,NONE,"if",$6,temp);
+                                                                }
+|   _WHILE  '(' Boolean ')' _DO Statement                       {
+                                                                    $$ = makeTreeNode(STATEMENT,WHILE,NULL,NONE,NONE,"while",$3,$6);
+                                                                }
 ;
 %%
 //-------------------------Auxiliary Functions--------------------------

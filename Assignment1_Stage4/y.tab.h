@@ -65,7 +65,8 @@ extern int yydebug;
     _THEN = 271,
     _ELSE = 272,
     _WHILE = 273,
-    _DO = 274
+    _DO = 274,
+    _SKIP = 275
   };
 #endif
 /* Tokens.  */
@@ -86,6 +87,7 @@ extern int yydebug;
 #define _ELSE 272
 #define _WHILE 273
 #define _DO 274
+#define _SKIP 275
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -95,7 +97,7 @@ union YYSTYPE
 
     struct AST_Node *node;
 
-#line 99 "y.tab.h"
+#line 101 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
