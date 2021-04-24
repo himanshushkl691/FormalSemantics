@@ -18,6 +18,7 @@ else    {return _ELSE;}
 while   {return _WHILE;}
 do      {return _DO;}
 skip    {yylval.node = makeTreeNode(STATEMENT,SKIP,NULL,NONE,NONE,yytext,NULL,NULL);return _SKIP;}
+STORE   {return _STORE;}
 "{"     {return *yytext;}
 "}"     {return *yytext;}
 "&&"    {return _AND;}

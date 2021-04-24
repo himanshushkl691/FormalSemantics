@@ -19,7 +19,7 @@
 /*TOKENS*/
 //operator
 %token  _AND _OR _NOT    _TRUE   _FALSE  _NUMERIC_VALUE  _PLUS   _MINUS  _MUL    _EQUALITY
-%token  _VARIABLE   _ASSIGN _IF _THEN   _ELSE   _WHILE  _DO _SKIP
+%token  _VARIABLE   _ASSIGN _IF _THEN   _ELSE   _WHILE  _DO _SKIP   _STORE
 //Associativity
 %left   _OR
 %left   _AND
@@ -33,16 +33,17 @@
 %%
 //---------------------------Rules-------------------------------------
 Program :   '\n'                        {return;}
+|   _STORE   '\n'                       {printMap(map);printf("\n\n");return;}
 |   Boolean '\n'                        {
                                             $1 = reduce($1,1);
                                             return;
                                         }
 |   Arithmetic  '\n'                    {
-                                            $1 = reduce($1,1);
+                                            $1 = reduce($1,0);
                                             return;
                                         }
 |   Statement   '\n'                    {
-                                            $1 = reduce($1,1);
+                                            $1 = reduce($1,0);
                                             return;
                                         }
 ;
@@ -112,9 +113,9 @@ void yyerror(const char *err){
 }
 
 int main(int argc,char *argv[]){
+    map = getNewHashTable();
     while(1)
     {
-        map = getNewHashTable();
         printf("> ");
         yyparse();
     }

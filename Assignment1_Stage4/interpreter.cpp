@@ -77,10 +77,9 @@ void printLL(struct dll *list)
     struct dll_node *curr = list->head;
     while (curr != NULL)
     {
-        printf("[ %s, %d] ", curr->key, curr->val);
+        printf("[%s --> %d] ", curr->key, curr->val);
         curr = curr->right;
     }
-    printf("\n");
     return;
 }
 //----------------------------------------------------------------------------------
@@ -148,7 +147,7 @@ void printMap(struct hash_table *map)
     {
         if (map->arr[i]->size > 0)
         {
-            printf("%d---> ", i);
+            // printf("%d---> ", i);
             printLL(map->arr[i]);
         }
     }
@@ -257,6 +256,7 @@ struct AST_Node *reduce(struct AST_Node *root, int printFlag)
                 ASTPrintTree(root);
                 printf("\n");
                 printMap(map);
+                printf("\n");
             }
             root = reduceStatement(root);
             return reduce(root, printFlag);
@@ -265,20 +265,17 @@ struct AST_Node *reduce(struct AST_Node *root, int printFlag)
     default:
         break;
     }
-    if (printFlag == 1)
+    if (root->typeClass != NONE)
     {
-        if (root->typeClass != NONE)
-        {
-            printf("\n=> ");
-            ASTPrintTree(root);
-            printf("\n\n");
-        }
-        else
-        {
-            printf("\n");
-            printMap(map);
-            printf("\n");
-        }
+        printf("\n=> ");
+        ASTPrintTree(root);
+        printf("\n\n");
+    }
+    else
+    {
+        printf("\n");
+        printMap(map);
+        printf("\n\n");
     }
     return root;
 }
@@ -442,7 +439,7 @@ struct AST_Node *reduceArithmeticExpression(struct AST_Node *root)
         }
         else
         {
-            char *news[(((sizeof res) * CHAR_BIT) + 2) / 3 + 2];
+            char *news[(((sizeof res->val) * CHAR_BIT) + 2) / 3 + 2];
             sprintf(news, "%d", res->val);
             curr = makeTreeNode(ARITHMETIC, VALUE, NULL, NONE, res->val, news, NULL, NULL);
             ASTDelete(root);

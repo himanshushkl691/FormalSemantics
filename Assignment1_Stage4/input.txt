@@ -1,1 +1,2 @@
 !false && !!(false || true)
+oddSum:=0;n:=1;while(!(n==11)) do {r:=n;div:=2;while(!(r == 0) && !(r==1)) do {r:=r-div};if(r==1) then {oddSum:=oddSum+n} else {skip};n:=n+1}
